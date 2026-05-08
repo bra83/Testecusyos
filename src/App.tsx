@@ -55,13 +55,14 @@ interface SKUItem {
 
 export default function App() {
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router>
       <MainApp />
     </Router>
   );
 }
 
 function MainApp() {
+  console.log('MainApp Rendering');
   const [activeTab, setActiveTab] = useState<Marketplace>('mercadolivre');
   const location = useLocation();
   
@@ -636,7 +637,7 @@ function MainApp() {
               </div>
             </div>
           } />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<div className="p-10 font-bold text-slate-400">Página não encontrada. Verifique a URL.</div>} />
         </Routes>
       </div>
 
