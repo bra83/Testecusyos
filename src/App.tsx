@@ -148,23 +148,23 @@ function MainApp() {
   }, [skus, activeTab]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col overflow-x-hidden">
       {/* Top Navigation Bar */}
-      <nav className="h-16 bg-slate-900 text-white flex items-center justify-between px-6 shrink-0 z-50">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded flex items-center justify-center font-bold text-xl transition-colors duration-500 ${
+      <nav className="h-16 md:h-16 bg-slate-900 text-white flex items-center justify-between px-3 md:px-6 shrink-0 z-50">
+        <div className="flex items-center gap-2 md:gap-8 min-w-0">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className={`w-8 h-8 rounded flex items-center justify-center font-bold text-xl transition-colors duration-500 shrink-0 ${
               activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black' : 
               activeTab === 'shopee' ? 'bg-orange-500' : 
               'bg-yellow-500 text-black'
             }`}>P</div>
-            <span className="text-xl font-bold tracking-tight uppercase">Precificador<span className={`${
+            <span className="text-sm md:text-xl font-bold tracking-tight uppercase truncate">Precificador<span className={`${
               activeTab === 'mercadolivre' ? 'text-yellow-400' : 
               activeTab === 'shopee' ? 'text-orange-400' : 
               'text-yellow-500'
             }`}>Pro</span></span>
           </div>
-          <div className="hidden md:flex gap-6 text-sm font-medium text-slate-300">
+          <div className="hidden xl:flex gap-6 text-sm font-medium text-slate-300">
             <Link to="/" className={`pb-5 pt-5 transition-colors ${
               currentPath === '/' ? 'text-white border-b-2 ' + (
                 activeTab === 'mercadolivre' ? 'border-yellow-400' : 
@@ -188,31 +188,34 @@ function MainApp() {
             }`}>Settings</Link>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700 mr-2">
+        <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+          <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700 overflow-x-auto no-scrollbar max-w-[150px] sm:max-w-none">
             <button 
               onClick={() => setActiveTab('mercadolivre')}
-              className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 ${activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2 sm:px-4 py-1.5 text-[8px] sm:text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 shrink-0 ${activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white'}`}
             >
-              <div className="w-2 h-2 rounded-full bg-black"></div>
-              Mercado Livre
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-black"></div>
+              <span className="hidden xs:inline">Mercado Livre</span>
+              <span className="xs:hidden">ML</span>
             </button>
             <button 
               onClick={() => setActiveTab('shopee')}
-              className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 ${activeTab === 'shopee' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2 sm:px-4 py-1.5 text-[8px] sm:text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 shrink-0 ${activeTab === 'shopee' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
-              <div className="w-2 h-2 rounded-full bg-white"></div>
-              Shopee
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
+              <span className="hidden xs:inline">Shopee</span>
+              <span className="xs:hidden">SH</span>
             </button>
             <button 
               onClick={() => setActiveTab('amazon')}
-              className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 ${activeTab === 'amazon' ? 'bg-yellow-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2 sm:px-4 py-1.5 text-[8px] sm:text-[10px] font-black uppercase rounded-md transition-all flex items-center gap-2 shrink-0 ${activeTab === 'amazon' ? 'bg-yellow-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
-              <div className="w-2 h-2 rounded-full bg-black"></div>
-              Amazon
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-black"></div>
+              <span className="hidden xs:inline">Amazon</span>
+              <span className="xs:hidden">AZ</span>
             </button>
           </div>
-          <div className="text-right hidden sm:block">
+          <div className="text-right hidden lg:block">
             <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Workspace</p>
             <p className="text-sm font-semibold text-white">
               {activeTab === 'mercadolivre' ? 'Mercado Livre v2025' : 
@@ -229,7 +232,7 @@ function MainApp() {
         </div>
       </nav>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-y-auto lg:overflow-hidden lg:h-[calc(100vh-64px)]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-3 md:p-4 overflow-y-auto lg:overflow-hidden lg:h-[calc(100vh-64px)] custom-scrollbar">
         <Routes>
           <Route path="/" element={
             <>
@@ -440,7 +443,7 @@ function MainApp() {
               </aside>
 
               {/* Main Dashboard Area */}
-              <main className="col-span-12 lg:col-span-9 flex flex-col gap-4 overflow-hidden pb-4">
+              <main className="col-span-12 lg:col-span-9 flex flex-col gap-4 min-h-0 pb-4">
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 shrink-0">
                   <SummaryCard 
@@ -471,18 +474,20 @@ function MainApp() {
 
                 {/* Table Content */}
                 <section className="bg-white col-span-1 lg:col-span-9 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[500px] lg:overflow-hidden h-full">
-                  <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                      <LayoutDashboard className={`w-4 h-4 ${activeTab === 'mercadolivre' ? 'text-black font-black' : 'text-orange-600'}`} />
-                      Lista de SKU {activeTab === 'mercadolivre' ? 'Mercado Livre' : 'Shopee'}
+                  <div className="px-4 md:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white z-10 shrink-0">
+                    <h3 className="text-xs md:text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2 shrink-0">
+                      <LayoutDashboard className={`w-4 h-4 mr-1 ${activeTab === 'mercadolivre' ? 'text-black font-black' : 'text-orange-600'}`} />
+                      <span className="truncate">Lista de SKU {activeTab === 'mercadolivre' ? 'Mercado Livre' : activeTab === 'shopee' ? 'Shopee' : 'Amazon'}</span>
                     </h3>
-                    <div className="flex gap-2 items-center">
-                      <div className="flex items-center gap-1.5 bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Cálculos Auditados 2026</span>
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                      <div className="flex items-center gap-1.5 bg-green-500/10 px-2 md:px-3 py-1.5 rounded-full border border-green-500/20 shrink-0">
+                        <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                        <span className="text-[8px] md:text-[10px] font-black text-green-700 uppercase tracking-widest whitespace-nowrap">Cálculos Auditados 2026</span>
                       </div>
-                      <button className="px-4 py-2 text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider">Exportar CSV</button>
-                      <button className="px-4 py-2 text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm">Editar Lote</button>
+                      <div className="flex gap-2 flex-1 sm:flex-none">
+                        <button className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider whitespace-nowrap">Exportar CSV</button>
+                        <button className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap">Editar Lote</button>
+                      </div>
                     </div>
                   </div>
 
@@ -1172,23 +1177,23 @@ function ComparisonModal({ sku, onClose }: { sku: SKUItem, onClose: () => void }
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-          <div>
-            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Comparativo de Canais</h3>
-            <p className="text-xs text-slate-500 font-bold uppercase">{sku.name} • Custo: R$ {sku.cost.toFixed(2)}</p>
+        <div className="px-5 md:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
+          <div className="min-w-0">
+            <h3 className="text-sm md:text-lg font-black text-slate-800 uppercase tracking-tight truncate">Comparativo de Canais</h3>
+            <p className="text-[9px] md:text-xs text-slate-500 font-bold uppercase truncate">{sku.name} • R$ {sku.cost.toFixed(2)}</p>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+            className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600 shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 overflow-y-auto custom-scrollbar flex-1">
           <ComparisonCard 
             title="Mercado Livre" 
             result={calculations.ml} 
@@ -1209,11 +1214,11 @@ function ComparisonModal({ sku, onClose }: { sku: SKUItem, onClose: () => void }
           />
         </div>
 
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Análise baseada em margem alvo de {sku.targetMarginPercent}%</p>
+        <div className="px-5 md:px-6 py-3 md:py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+          <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center sm:text-left">Análise baseada em margem alvo de {sku.targetMarginPercent}%</p>
           <button 
             onClick={onClose}
-            className="px-6 py-2 bg-slate-900 text-white text-[10px] font-black uppercase rounded-lg hover:bg-slate-800 transition-colors"
+            className="w-full sm:w-auto px-8 py-2.5 bg-slate-900 text-white text-[10px] font-black uppercase rounded-lg hover:bg-slate-800 transition-colors"
           >
             Fechar
           </button>
@@ -1232,26 +1237,26 @@ function ComparisonCard({ title, result, color, icon }: { title: string, result:
   };
 
   return (
-    <div className={`rounded-xl border p-5 flex flex-col gap-4 ${colors[color].split(' ').slice(0, 2).join(' ')}`}>
+    <div className={`rounded-xl border p-4 md:p-5 flex flex-col gap-3 md:gap-4 ${colors[color].split(' ').slice(0, 2).join(' ')}`}>
       <div className="flex items-center gap-3">
         {icon}
-        <h4 className={`text-sm font-black uppercase tracking-tight ${colors[color].split(' ')[2]}`}>{title}</h4>
+        <h4 className={`text-xs md:text-sm font-black uppercase tracking-tight ${colors[color].split(' ')[2]}`}>{title}</h4>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2 md:space-y-3">
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase">Preço p/ Margem Alvo</p>
-          <p className="text-2xl font-black tracking-tight text-slate-900">R$ {result.salePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase">Preço p/ Margem Alvo</p>
+          <p className="text-xl md:text-2xl font-black tracking-tight text-slate-900">R$ {result.salePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-white/60 p-2 rounded-lg border border-white">
-            <p className="text-[8px] font-black text-slate-400 uppercase">Lucro Líquido</p>
-            <p className={`text-xs font-black ${result.netProfit > 0 ? 'text-green-600' : 'text-red-500'}`}>R$ {result.netProfit.toFixed(2)}</p>
+            <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase">Lucro Líquido</p>
+            <p className={`text-[10px] md:text-xs font-black ${result.netProfit > 0 ? 'text-green-600' : 'text-red-500'}`}>R$ {result.netProfit.toFixed(2)}</p>
           </div>
           <div className="bg-white/60 p-2 rounded-lg border border-white">
-            <p className="text-[8px] font-black text-slate-400 uppercase">Margem Real</p>
-            <p className={`text-xs font-black ${result.realMarginPercent > 0 ? 'text-green-600' : 'text-red-500'}`}>{result.realMarginPercent.toFixed(1)}%</p>
+            <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase">Margem Real</p>
+            <p className={`text-[10px] md:text-xs font-black ${result.realMarginPercent > 0 ? 'text-green-600' : 'text-red-500'}`}>{result.realMarginPercent.toFixed(1)}%</p>
           </div>
         </div>
 
