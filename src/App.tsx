@@ -4,6 +4,7 @@
  */
 
 import { useState, useMemo, useEffect, ReactNode } from 'react';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Trash2, 
@@ -52,7 +53,17 @@ interface SKUItem {
 }
 
 export default function App() {
+  return (
+    <Router>
+      <MainApp />
+    </Router>
+  );
+}
+
+function MainApp() {
   const [activeTab, setActiveTab] = useState<Marketplace>('mercadolivre');
+  const location = useLocation();
+  
   const [skus, setSkus] = useState<SKUItem[]>([
     {
       id: '1',
@@ -149,13 +160,27 @@ export default function App() {
             }`}>Pro</span></span>
           </div>
           <div className="hidden md:flex gap-6 text-sm font-medium text-slate-300">
-            <a href="#" className={`text-white border-b-2 pb-5 pt-5 ${
-              activeTab === 'mercadolivre' ? 'border-yellow-400' : 
-              activeTab === 'shopee' ? 'border-orange-500' : 
-              'border-yellow-500'
-            }`}>Dashboard</a>
-            <a href="#" className="hover:text-white transition-colors pb-5 pt-5 opacity-60">Manager</a>
-            <a href="#" className="hover:text-white transition-colors pb-5 pt-5 opacity-60">Tax Tables</a>
+            <Link to="/" className={`pb-5 pt-5 transition-colors ${
+              location.pathname === '/' ? 'text-white border-b-2 ' + (
+                activeTab === 'mercadolivre' ? 'border-yellow-400' : 
+                activeTab === 'shopee' ? 'border-orange-500' : 
+                'border-yellow-500'
+              ) : 'opacity-60 hover:text-white'
+            }`}>Dashboard</Link>
+            <Link to="/manager" className={`pb-5 pt-5 transition-colors ${
+              location.pathname === '/manager' ? 'text-white border-b-2 ' + (
+                activeTab === 'mercadolivre' ? 'border-yellow-400' : 
+                activeTab === 'shopee' ? 'border-orange-500' : 
+                'border-yellow-500'
+              ) : 'opacity-60 hover:text-white'
+            }`}>Manager</Link>
+            <Link to="/settings" className={`pb-5 pt-5 transition-colors ${
+              location.pathname === '/settings' ? 'text-white border-b-2 ' + (
+                activeTab === 'mercadolivre' ? 'border-yellow-400' : 
+                activeTab === 'shopee' ? 'border-orange-500' : 
+                'border-yellow-500'
+              ) : 'opacity-60 hover:text-white'
+            }`}>Settings</Link>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -200,292 +225,414 @@ export default function App() {
       </nav>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-y-auto lg:overflow-hidden lg:h-[calc(100vh-64px)]">
-        
-        {/* Sidebar / Configuration */}
-        <aside className="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
-          {/* Global Performance Summary */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm shrink-0">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Global Performance</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-2xl font-black text-slate-800 tracking-tight">{stats.avgMargin.toFixed(1)}%</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Média Margem</p>
-              </div>
-              <div>
-                <p className="text-2xl font-black text-green-600 tracking-tight">R$ {stats.totalProfit.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Lucro Est.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Pricing Engine / Global Controls */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Vantagem Competitiva</h3>
-              <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${activeTab === 'mercadolivre' ? 'bg-yellow-100 text-yellow-800' : activeTab === 'shopee' ? 'bg-orange-100 text-orange-700' : 'bg-yellow-50 text-yellow-700'}`}>LIVE API</span>
-            </div>
-
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Busca Rápida</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
-                  <input 
-                    type="text" 
-                    placeholder="Filtrar SKUs..."
-                    className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none transition-all shadow-sm ${
-                      activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
-                      activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
-                      'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
-                    }`}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+        <Routes>
+          <Route path="/" element={
+            <>
+              {/* Sidebar / Configuration */}
+              <aside className="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
+                {/* Global Performance Summary */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm shrink-0">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Global Performance</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-2xl font-black text-slate-800 tracking-tight">{stats.avgMargin.toFixed(1)}%</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Média Margem</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-green-600 tracking-tight">R$ {stats.totalProfit.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Lucro Est.</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imp. Global (%)</label>
-                  <input 
-                    type="number" 
-                    min="0"
-                    max="100"
-                    className={`w-full text-sm font-bold bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none transition-all shadow-sm ${
-                      activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
-                      activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
-                      'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
-                    }`}
-                    value={globalTax}
-                    onChange={(e) => setGlobalTax(Math.max(0, Math.min(100, Number(e.target.value))))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ads Global (%)</label>
-                  <input 
-                    type="number" 
-                    min="0"
-                    max="100"
-                    className={`w-full text-sm font-bold bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none transition-all shadow-sm ${
-                      activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
-                      activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
-                      'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
-                    }`}
-                    value={globalAds}
-                    onChange={(e) => setGlobalAds(Math.max(0, Math.min(100, Number(e.target.value))))}
-                  />
-                </div>
-              </div>
+                {/* Pricing Engine / Global Controls */}
+                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Vantagem Competitiva</h3>
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${activeTab === 'mercadolivre' ? 'bg-yellow-100 text-yellow-800' : activeTab === 'shopee' ? 'bg-orange-100 text-orange-700' : 'bg-yellow-50 text-yellow-700'}`}>LIVE API</span>
+                  </div>
 
-              <button 
-                onClick={addSKU}
-                className={`w-full py-3.5 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
-                  activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black hover:bg-yellow-500 shadow-yellow-400/10' : 
-                  activeTab === 'shopee' ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-500/20' : 
-                  'bg-yellow-600 hover:bg-yellow-700 text-black shadow-yellow-600/20'
-                }`}
-              >
-                <Plus className="w-4 h-4" />
-                Novo SKU Manager
-              </button>
-            </div>
-          </div>          {/* Quick Pricing Simulator */}
-          <div className={`rounded-xl p-6 text-white shadow-xl transition-colors duration-500 ${
-            activeTab === 'mercadolivre' ? 'bg-yellow-500 text-black shadow-yellow-200' : 
-            activeTab === 'shopee' ? 'bg-orange-600 shadow-orange-200' :
-            'bg-zinc-900 border border-yellow-500/30'
-          }`}>
-             <div className="flex items-center gap-3 mb-5 border-b border-white/20 pb-4">
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  <Calculator className="w-4 h-4" />
-                </div>
-                <h4 className="text-[11px] font-black uppercase tracking-widest text-white">Simulador Comparativo</h4>
-             </div>
-             
-             <div className="space-y-4">
-               <div>
-                 <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Nome do Produto</label>
-                 <input 
-                  type="text" 
-                  placeholder="Ex: Teclado Mecânico RGB"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  id="sim-name"
-                 />
-               </div>
-               <div className="grid grid-cols-2 gap-3">
-                 <div>
-                   <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Custo SKU (R$)</label>
-                   <input 
-                    type="number" 
-                    value={simParams.cost}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
-                    onChange={(e) => setSimParams({ ...simParams, cost: Number(e.target.value) })}
-                   />
-                 </div>
-                 <div>
-                   <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Margem (%)</label>
-                   <input 
-                    type="number" 
-                    min="0"
-                    max="100"
-                    value={simParams.margin}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
-                    onChange={(e) => setSimParams({ ...simParams, margin: Math.max(0, Math.min(100, Number(e.target.value))) })}
-                   />
-                 </div>
-               </div>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Busca Rápida</label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
+                        <input 
+                          type="text" 
+                          placeholder="Filtrar SKUs..."
+                          className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none transition-all shadow-sm ${
+                            activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
+                            activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
+                            'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
+                          }`}
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                    </div>
 
-               <div className="grid grid-cols-2 gap-3">
-                 <div>
-                    <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Tipo de Anúncio</label>
-                    <select 
-                      value={simParams.adType}
-                      onChange={(e) => setSimParams({ ...simParams, adType: e.target.value as AdType })}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none"
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imp. Global (%)</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          max="100"
+                          className={`w-full text-sm font-bold bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none transition-all shadow-sm ${
+                            activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
+                            activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
+                            'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
+                          }`}
+                          value={globalTax}
+                          onChange={(e) => setGlobalTax(Math.max(0, Math.min(100, Number(e.target.value))))}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ads Global (%)</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          max="100"
+                          className={`w-full text-sm font-bold bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none transition-all shadow-sm ${
+                            activeTab === 'mercadolivre' ? 'focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400' : 
+                            activeTab === 'shopee' ? 'focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500' : 
+                            'focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500'
+                          }`}
+                          value={globalAds}
+                          onChange={(e) => setGlobalAds(Math.max(0, Math.min(100, Number(e.target.value))))}
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={addSKU}
+                      className={`w-full py-3.5 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
+                        activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black hover:bg-yellow-500 shadow-yellow-400/10' : 
+                        activeTab === 'shopee' ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-500/20' : 
+                        'bg-yellow-600 hover:bg-yellow-700 text-black shadow-yellow-600/20'
+                      }`}
                     >
-                      <option value="classico" className="text-slate-900">Standard / Clássico</option>
-                      <option value="premium" className="text-slate-900">Premium / FBA / Full</option>
-                    </select>
-                 </div>
-                 <div>
-                    <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Custo Envio (R$)</label>
-                    <input 
-                      type="number"
-                      value={simParams.shipping}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
-                      onChange={(e) => setSimParams({ ...simParams, shipping: Number(e.target.value) })}
-                    />
-                 </div>
-               </div>
+                      <Plus className="w-4 h-4" />
+                      Novo SKU Manager
+                    </button>
+                  </div>
+                </div>
 
-               {/* Comparison Result Preview */}
-               <div className="bg-black/20 rounded-xl p-4 space-y-3">
-                 <p className="text-[8px] font-black uppercase text-white/40 mb-1">Lucro Estimado por Unidade:</p>
-                 <SimulationPreview 
-                    cost={simParams.cost} 
-                    margin={simParams.margin} 
-                    adType={simParams.adType}
-                    shipping={simParams.shipping}
-                    globalTax={globalTax} 
-                    globalAds={globalAds} 
-                  />
-               </div>
-
-               <button 
-                onClick={() => {
-                  const nameInput = document.getElementById('sim-name') as HTMLInputElement;
-                  const name = nameInput.value || `Novo SKU ${skus.length + 1}`;
+                {/* Quick Pricing Simulator */}
+                <div className={`rounded-xl p-6 text-white shadow-xl transition-colors duration-500 ${
+                  activeTab === 'mercadolivre' ? 'bg-yellow-500 text-black shadow-yellow-200' : 
+                  activeTab === 'shopee' ? 'bg-orange-600 shadow-orange-200' :
+                  'bg-zinc-900 border border-yellow-500/30'
+                }`}>
+                  <div className="flex items-center gap-3 mb-5 border-b border-white/20 pb-4">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                        <Calculator className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-[11px] font-black uppercase tracking-widest text-white">Simulador Comparativo</h4>
+                  </div>
                   
-                  const newSku: SKUItem = {
-                    id: Math.random().toString(36).substr(2, 9),
-                    name: name,
-                    cost: simParams.cost,
-                    categoryId: activeTab === 'mercadolivre' ? 'casa_moveis' : (activeTab === 'amazon' ? 'casa' : 'geral'),
-                    adType: simParams.adType,
-                    adsPercent: globalAds,
-                    fulfillment: activeTab === 'amazon' && simParams.adType === 'premium' ? AMAZON_FBA_TIERS[0].cost : 0,
-                    amazonTierId: activeTab === 'amazon' && simParams.adType === 'premium' ? AMAZON_FBA_TIERS[0].id : undefined,
-                    taxPercent: globalTax,
-                    targetMarginPercent: simParams.margin,
-                    shipping: simParams.shipping,
-                    marketplace: activeTab
-                  };
-                  setSkus([...skus, newSku]);
-                  nameInput.value = '';
-                }}
-                className={`w-full py-3 bg-white font-black text-[10px] uppercase tracking-widest rounded-lg transition-colors shadow-lg ${
-                  activeTab === 'mercadolivre' ? 'text-black hover:bg-yellow-100' : 
-                  activeTab === 'shopee' ? 'text-orange-600 hover:bg-orange-50' :
-                  'text-zinc-900 hover:bg-yellow-50'
-                }`}
-               >
-                 Adicionar ao {activeTab === 'mercadolivre' ? 'ML' : activeTab === 'shopee' ? 'Shopee' : 'Amazon'}
-               </button>
-             </div>
-          </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Nome do Produto</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Teclado Mecânico RGB"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        id="sim-name"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Custo SKU (R$)</label>
+                        <input 
+                          type="number" 
+                          value={simParams.cost}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
+                          onChange={(e) => setSimParams({ ...simParams, cost: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Margem (%)</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          max="100"
+                          value={simParams.margin}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
+                          onChange={(e) => setSimParams({ ...simParams, margin: Math.max(0, Math.min(100, Number(e.target.value))) })}
+                        />
+                      </div>
+                    </div>
 
-        </aside>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                          <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Tipo de Anúncio</label>
+                          <select 
+                            value={simParams.adType}
+                            onChange={(e) => setSimParams({ ...simParams, adType: e.target.value as AdType })}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none"
+                          >
+                            <option value="classico" className="text-slate-900">Standard / Clássico</option>
+                            <option value="premium" className="text-slate-900">Premium / FBA / Full</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label className="block text-[9px] font-black uppercase tracking-widest text-white/70 mb-2">Custo Envio (R$)</label>
+                          <input 
+                            type="number"
+                            value={simParams.shipping}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
+                            onChange={(e) => setSimParams({ ...simParams, shipping: Number(e.target.value) })}
+                          />
+                      </div>
+                    </div>
 
-        {/* Main Dashboard Area */}
-        <main className="col-span-12 lg:col-span-9 flex flex-col gap-4 overflow-hidden pb-4">
-          
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 shrink-0">
-            <SummaryCard 
-              label="Faturamento Estimado" 
-              value={`R$ ${stats.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-              subValue="Baseado em 1 unidade/SKU"
-              accent={activeTab === 'mercadolivre' ? 'black' : activeTab === 'shopee' ? 'orange' : 'yellow'}
-            />
-            <SummaryCard 
-              label="Lucro Líquido Total" 
-              value={`R$ ${stats.totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-              subValue="Receita total - Despesas"
-              accent="green"
-            />
-            <SummaryCard 
-              label="Margem Média Geral" 
-              value={`${stats.avgMargin.toFixed(2)}%`}
-              subValue="Eficiência do catálogo"
-              accent="slate"
-            />
-            <SummaryCard 
-              label="Total de SKUs" 
-              value={`${skus.filter(s => s.marketplace === activeTab).length}`}
-              subValue="Produtos em análise"
-              accent="slate"
-            />
-          </div>
+                    {/* Comparison Result Preview */}
+                    <div className="bg-black/20 rounded-xl p-4 space-y-3">
+                      <p className="text-[8px] font-black uppercase text-white/40 mb-1">Lucro Estimado por Unidade:</p>
+                      <SimulationPreview 
+                        cost={simParams.cost} 
+                        margin={simParams.margin} 
+                        adType={simParams.adType}
+                        shipping={simParams.shipping}
+                        globalTax={globalTax} 
+                        globalAds={globalAds} 
+                      />
+                    </div>
 
-          {/* Table Content */}
-          <section className="bg-white col-span-1 lg:col-span-9 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[500px] lg:overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                <LayoutDashboard className={`w-4 h-4 ${activeTab === 'mercadolivre' ? 'text-black font-black' : 'text-orange-600'}`} />
-                Lista de SKU {activeTab === 'mercadolivre' ? 'Mercado Livre' : 'Shopee'}
-              </h3>
-              <div className="flex gap-2">
-                 <button className="px-4 py-2 text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider">Exportar CSV</button>
-                 <button className="px-4 py-2 text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm">Editar Lote</button>
+                    <button 
+                      onClick={() => {
+                        const nameInput = document.getElementById('sim-name') as HTMLInputElement;
+                        const name = nameInput.value || `Novo SKU ${skus.length + 1}`;
+                        
+                        const newSku: SKUItem = {
+                          id: Math.random().toString(36).substr(2, 9),
+                          name: name,
+                          cost: simParams.cost,
+                          categoryId: activeTab === 'mercadolivre' ? 'casa_moveis' : (activeTab === 'amazon' ? 'casa' : 'geral'),
+                          adType: simParams.adType,
+                          adsPercent: globalAds,
+                          fulfillment: activeTab === 'amazon' && simParams.adType === 'premium' ? AMAZON_FBA_TIERS[0].cost : 0,
+                          amazonTierId: activeTab === 'amazon' && simParams.adType === 'premium' ? AMAZON_FBA_TIERS[0].id : undefined,
+                          taxPercent: globalTax,
+                          targetMarginPercent: simParams.margin,
+                          shipping: simParams.shipping,
+                          marketplace: activeTab
+                        };
+                        setSkus([...skus, newSku]);
+                        nameInput.value = '';
+                      }}
+                      className={`w-full py-3 bg-white font-black text-[10px] uppercase tracking-widest rounded-lg transition-colors shadow-lg ${
+                        activeTab === 'mercadolivre' ? 'text-black hover:bg-yellow-100' : 
+                        activeTab === 'shopee' ? 'text-orange-600 hover:bg-orange-50' :
+                        'text-zinc-900 hover:bg-yellow-50'
+                      }`}
+                    >
+                      Adicionar ao {activeTab === 'mercadolivre' ? 'ML' : activeTab === 'shopee' ? 'Shopee' : 'Amazon'}
+                    </button>
+                  </div>
+                </div>
+              </aside>
+
+              {/* Main Dashboard Area */}
+              <main className="col-span-12 lg:col-span-9 flex flex-col gap-4 overflow-hidden pb-4">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 shrink-0">
+                  <SummaryCard 
+                    label="Faturamento Estimado" 
+                    value={`R$ ${stats.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                    subValue="Baseado em 1 unidade/SKU"
+                    accent={activeTab === 'mercadolivre' ? 'black' : activeTab === 'shopee' ? 'orange' : 'yellow'}
+                  />
+                  <SummaryCard 
+                    label="Lucro Líquido Total" 
+                    value={`R$ ${stats.totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                    subValue="Receita total - Despesas"
+                    accent="green"
+                  />
+                  <SummaryCard 
+                    label="Margem Média Geral" 
+                    value={`${stats.avgMargin.toFixed(2)}%`}
+                    subValue="Eficiência do catálogo"
+                    accent="slate"
+                  />
+                  <SummaryCard 
+                    label="Total de SKUs" 
+                    value={`${skus.filter(s => s.marketplace === activeTab).length}`}
+                    subValue="Produtos em análise"
+                    accent="slate"
+                  />
+                </div>
+
+                {/* Table Content */}
+                <section className="bg-white col-span-1 lg:col-span-9 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[500px] lg:overflow-hidden h-full">
+                  <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                      <LayoutDashboard className={`w-4 h-4 ${activeTab === 'mercadolivre' ? 'text-black font-black' : 'text-orange-600'}`} />
+                      Lista de SKU {activeTab === 'mercadolivre' ? 'Mercado Livre' : 'Shopee'}
+                    </h3>
+                    <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-1.5 bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                        <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Cálculos Auditados 2026</span>
+                      </div>
+                      <button className="px-4 py-2 text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider">Exportar CSV</button>
+                      <button className="px-4 py-2 text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm">Editar Lote</button>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
+                    <table className="w-full text-left min-w-[1100px] border-separate border-spacing-0">
+                      <thead className="sticky top-0 bg-slate-50/95 backdrop-blur-sm z-20 shadow-sm">
+                        <tr className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">
+                          <th className="px-6 py-4 border-b border-slate-100">SKU Detail</th>
+                          <th className="px-5 py-4 border-b border-slate-100 text-center">Custo Produto</th>
+                          <th className="px-5 py-4 border-b border-slate-100 text-center uppercase">
+                            {activeTab === 'mercadolivre' ? 'Tipo Anúncio' : 'Comissão'}
+                          </th>
+                          <th className="px-5 py-4 border-b border-slate-100 text-center">
+                            {activeTab === 'mercadolivre' ? 'Frete (Pago por você)' : 'Custos Envio (Vendedor)'}
+                          </th>
+                          <th className="px-5 py-4 border-b border-slate-100 text-center uppercase">Ads & Imp. %</th>
+                          <th className={`px-5 py-4 border-b border-slate-100 text-center ${activeTab === 'mercadolivre' ? 'bg-yellow-400/10' : 'bg-orange-50/50'}`}>Margem Alvo</th>
+                          <th className={`px-5 py-4 border-b border-slate-100 text-center ${activeTab === 'mercadolivre' ? 'bg-yellow-400/20 text-black' : 'bg-orange-600/5 text-orange-600'}`}>Preço Venda</th>
+                          <th className="px-5 py-4 border-b border-slate-100 text-right">Real Margin %</th>
+                          <th className="px-6 py-4 border-b border-slate-100 w-16"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        <AnimatePresence mode="popLayout">
+                          {filteredSkus.map((sku) => (
+                            <ProfessionallyPolishedRow 
+                              key={sku.id} 
+                              sku={sku} 
+                              onUpdate={updateSKU} 
+                              onRemove={removeSKU} 
+                              onCompare={setComparingSku}
+                            />
+                          ))}
+                        </AnimatePresence>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </main>
+            </>
+          } />
+          <Route path="/manager" element={
+            <div className="col-span-12 flex items-center justify-center bg-white rounded-2xl border border-slate-200 p-20 shadow-sm h-full">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Package className="w-10 h-10 text-slate-400" />
+                </div>
+                <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Stock Manager</h2>
+                <p className="text-slate-500 max-w-md mx-auto mt-4 font-medium">Esta funcionalidade permitirá que você gerencie seu estoque diretamente de forma integrada com o precificador. Em breve.</p>
+                <Link to="/" className={`inline-block mt-8 px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg ${activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black' : 'bg-blue-600 text-white'}`}>Voltar ao Dashboard</Link>
               </div>
             </div>
+          } />
+          <Route path="/settings" element={
+            <div className="col-span-12 flex flex-col gap-6 h-full overflow-y-auto pb-10">
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center">
+                    <Table className="w-6 h-6 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Tabelas de Referência</h2>
+                    <p className="text-xs text-slate-500 font-bold uppercase">Taxas e Regras de Precificação 2025/2026</p>
+                  </div>
+                </div>
 
-            <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
-              <table className="w-full text-left min-w-[1100px] border-separate border-spacing-0">
-                <thead className="sticky top-0 bg-slate-50/95 backdrop-blur-sm z-20 shadow-sm">
-                  <tr className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">
-                    <th className="px-6 py-4 border-b border-slate-100">SKU Detail</th>
-                    <th className="px-5 py-4 border-b border-slate-100 text-center">Custo Produto</th>
-                    <th className="px-5 py-4 border-b border-slate-100 text-center uppercase">
-                      {activeTab === 'mercadolivre' ? 'Tipo Anúncio' : 'Comissão'}
-                    </th>
-                    <th className="px-5 py-4 border-b border-slate-100 text-center">
-                      {activeTab === 'mercadolivre' ? 'Frete (Pago por você)' : 'Custos Envio (Vendedor)'}
-                    </th>
-                    <th className="px-5 py-4 border-b border-slate-100 text-center uppercase">Ads & Imp. %</th>
-                    <th className={`px-5 py-4 border-b border-slate-100 text-center ${activeTab === 'mercadolivre' ? 'bg-yellow-400/10' : 'bg-orange-50/50'}`}>Margem Alvo</th>
-                    <th className={`px-5 py-4 border-b border-slate-100 text-center ${activeTab === 'mercadolivre' ? 'bg-yellow-400/20 text-black' : 'bg-orange-600/5 text-orange-600'}`}>Preço Venda</th>
-                    <th className="px-5 py-4 border-b border-slate-100 text-right">Real Margin %</th>
-                    <th className="px-6 py-4 border-b border-slate-100 w-16"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <AnimatePresence mode="popLayout">
-                    {filteredSkus.map((sku) => (
-                      <ProfessionallyPolishedRow 
-                        key={sku.id} 
-                        sku={sku} 
-                        onUpdate={updateSKU} 
-                        onRemove={removeSKU} 
-                        onCompare={setComparingSku}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </tbody>
-              </table>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Mercado Livre Rules */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black text-yellow-600 uppercase border-b border-yellow-100 pb-2 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                      Mercado Livre (ME2/Full)
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Limite Frete Grátis</span>
+                        <span className="font-black text-slate-900">R$ 79,00</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Taxa Fixa (&lt; R$ 79)</span>
+                        <span className="font-black text-slate-900">R$ 6,00</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Comissão (Clássico)</span>
+                        <span className="font-black text-slate-900">10% - 13%</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Comissão (Premium)</span>
+                        <span className="font-black text-slate-900">15% - 18%</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Desc. Frete (Verde)</span>
+                        <span className="font-black text-green-600">40% OFF</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shopee Rules */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black text-orange-600 uppercase border-b border-orange-100 pb-2 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      Shopee Brasil
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Taxa de Serviço Base</span>
+                        <span className="font-black text-slate-900">14%</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Programa Frete Grátis</span>
+                        <span className="font-black text-slate-900">+ 6% (Total 20%)</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Taxa Fixa Transação</span>
+                        <span className="font-black text-slate-900">R$ 3,00 por item</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Cap de Comissão</span>
+                        <span className="font-black text-slate-900">R$ 103,00 máx.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Amazon Rules */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black text-yellow-700 uppercase border-b border-yellow-200 pb-2 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-yellow-600"></div>
+                      Amazon Brasil
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Comissão de Indicação</span>
+                        <span className="font-black text-slate-900">8% - 15%</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Tarifa Mínima</span>
+                        <span className="font-black text-slate-900">R$ 1,00</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1 border-b border-slate-50">
+                        <span className="font-bold text-slate-600">Fulfillment (FBA)</span>
+                        <span className="font-black text-slate-900">Por dimensões</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-12 pt-8 border-t border-slate-100 flex justify-center">
+                  <Link to="/" className={`px-10 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 ${activeTab === 'mercadolivre' ? 'bg-yellow-400 text-black shadow-yellow-200' : 'bg-slate-900 text-white shadow-slate-200'}`}>
+                    Confirmar e Voltar ao Dashboard
+                  </Link>
+                </div>
+              </div>
             </div>
-          </section>
-        </main>
+          } />
+        </Routes>
       </div>
 
       <AnimatePresence>
