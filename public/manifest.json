@@ -2,7 +2,7 @@
   "name": "Precificador Pro",
   "short_name": "Precificador",
   "description": "Calculadora de precificação profissional para marketplaces",
-  "start_url": "/Testecusyos/",
+  "start_url": "index.html",
   "scope": "/Testecusyos/",
   "display": "standalone",
   "background_color": "#0f172a",
