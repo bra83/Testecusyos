@@ -22,7 +22,8 @@ import {
   Scale,
   Table,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
