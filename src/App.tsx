@@ -69,24 +69,45 @@ function MainApp() {
   // Normalizing pathname for HashRouter sub-routes if needed
   const currentPath = location.pathname;
   
-  const [skus, setSkus] = useState<SKUItem[]>([
-    {
-      id: '1',
-      name: 'Exemplo de Produto 1',
-      cost: 50,
-      categoryId: 'casa_moveis',
-      adType: 'classico',
-      adsPercent: 5,
-      fulfillment: 0,
-      taxPercent: 4,
-      targetMarginPercent: 20,
-      shipping: 0,
-      marketplace: 'mercadolivre'
-    }
-  ]);
+  const [skus, setSkus] = useState<SKUItem[]>(() => {
+    const saved = localStorage.getItem('precificador_skus');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: '1',
+        name: 'Exemplo de Produto 1',
+        cost: 50,
+        categoryId: 'casa_moveis',
+        adType: 'classico',
+        adsPercent: 5,
+        fulfillment: 0,
+        taxPercent: 4,
+        targetMarginPercent: 20,
+        shipping: 0,
+        marketplace: 'mercadolivre'
+      }
+    ];
+  });
 
-  const [globalTax, setGlobalTax] = useState(4);
-  const [globalAds, setGlobalAds] = useState(5);
+  const [globalTax, setGlobalTax] = useState(() => {
+    const saved = localStorage.getItem('precificador_tax');
+    return saved ? Number(saved) : 4;
+  });
+  const [globalAds, setGlobalAds] = useState(() => {
+    const saved = localStorage.getItem('precificador_ads');
+    return saved ? Number(saved) : 5;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('precificador_skus', JSON.stringify(skus));
+  }, [skus]);
+
+  useEffect(() => {
+    localStorage.setItem('precificador_tax', globalTax.toString());
+  }, [globalTax]);
+
+  useEffect(() => {
+    localStorage.setItem('precificador_ads', globalAds.toString());
+  }, [globalAds]);
   const [searchTerm, setSearchTerm] = useState('');
   const [comparingSku, setComparingSku] = useState<SKUItem | null>(null);
   const [simParams, setSimParams] = useState({
@@ -122,24 +143,22 @@ function MainApp() {
   const handleExportCSV = () => {
     if (filteredSkus.length === 0) return;
 
-    const headers = ['ID', 'Nome', 'Custo (R$)', 'Marketplace', 'Tipo Anúncio', 'Imposto (%)', 'Ads (%)', 'Margem Alvo (%)', 'Preço de Venda (R$)', 'Lucro Líquido (R$)', 'Margem Real (%)'];
+    // Headers mapped to SKUItem properties for easier re-import
+    const headers = ['id', 'name', 'cost', 'marketplace', 'adType', 'taxPercent', 'adsPercent', 'targetMarginPercent', 'categoryId', 'shipping', 'fulfillment'];
     
     const rows = filteredSkus.map(sku => {
-      const category = CATEGORIES.find(c => c.id === sku.categoryId) || CATEGORIES[0];
-      const result = calculatePrice({ ...sku, category, marketplace: sku.marketplace });
-      
       return [
         sku.id,
         sku.name,
-        sku.cost.toFixed(2),
+        sku.cost.toString(),
         sku.marketplace,
         sku.adType,
-        sku.taxPercent,
-        sku.adsPercent,
-        sku.targetMarginPercent,
-        result.salePrice.toFixed(2),
-        result.netProfit.toFixed(2),
-        result.realMarginPercent.toFixed(1)
+        sku.taxPercent.toString(),
+        sku.adsPercent.toString(),
+        sku.targetMarginPercent.toString(),
+        sku.categoryId,
+        sku.shipping.toString(),
+        sku.fulfillment.toString()
       ];
     });
 
@@ -157,6 +176,57 @@ function MainApp() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+      if (lines.length < 2) return;
+
+      const headers = lines[0].split(';');
+      const newImportedSkus: SKUItem[] = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(';');
+        const item: any = {};
+        headers.forEach((header, index) => {
+          const val = values[index];
+          if (['cost', 'taxPercent', 'adsPercent', 'targetMarginPercent', 'shipping', 'fulfillment'].includes(header.trim())) {
+            item[header.trim()] = Number(val.replace(',', '.'));
+          } else {
+            item[header.trim()] = val;
+          }
+        });
+
+        if (item.id && item.name) {
+          // Generate new ID for imported items to avoid collisions, or keep if user wants to overwrite
+          // For safety, let's keep the ID but check for collisions and replace duplicates
+          newImportedSkus.push(item as SKUItem);
+        }
+      }
+
+      if (newImportedSkus.length > 0) {
+        // Merge with existing skus by ID (prefer imported)
+        const merged = [...skus];
+        newImportedSkus.forEach(imported => {
+          const index = merged.findIndex(s => s.id === imported.id);
+          if (index >= 0) {
+            merged[index] = imported;
+          } else {
+            merged.push(imported);
+          }
+        });
+        setSkus(merged);
+        alert(`${newImportedSkus.length} SKUs importados/atualizados com sucesso!`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
   };
 
   const handleBatchUpdateMargin = (newMargin: number) => {
@@ -566,6 +636,19 @@ function MainApp() {
                         <span className="text-[8px] md:text-[10px] font-black text-green-700 uppercase tracking-widest whitespace-nowrap">Cálculos Auditados 2026</span>
                       </div>
                       <div className="flex gap-2 flex-1 sm:flex-none">
+                        <input 
+                          type="file" 
+                          id="csv-import" 
+                          className="hidden" 
+                          accept=".csv"
+                          onChange={handleImportCSV}
+                        />
+                        <button 
+                          onClick={() => document.getElementById('csv-import')?.click()}
+                          className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider whitespace-nowrap"
+                        >
+                          Importar CSV
+                        </button>
                         <button 
                           onClick={handleExportCSV}
                           className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider whitespace-nowrap"
