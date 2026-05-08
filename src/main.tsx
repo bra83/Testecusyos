@@ -13,8 +13,7 @@ try {
   // Register Service Worker for PWA
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      const swPath = import.meta.env.BASE_URL + 'sw.js';
-      navigator.serviceWorker.register(swPath).catch(err => {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
         console.log('ServiceWorker registration failed: ', err);
       });
     });
