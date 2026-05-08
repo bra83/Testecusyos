@@ -97,6 +97,27 @@ function MainApp() {
 
   const [isBatchEditOpen, setIsBatchEditOpen] = useState(false);
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    });
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      alert('Para instalar, clique nos três pontinhos do seu navegador (Chrome) ou no botão de Compartilhar (Safari) e escolha "Adicionar à tela de início".');
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
+
   const handleExportCSV = () => {
     if (filteredSkus.length === 0) return;
 
@@ -274,7 +295,14 @@ function MainApp() {
                activeTab === 'shopee' ? 'Shopee Maio 2026' : 'Amazon Brasil Full'}
             </p>
           </div>
-          <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-xs font-black shadow-inner transition-colors duration-500 ${
+          <button 
+            onClick={handleInstallClick}
+            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-3 py-2 rounded-lg text-[10px] font-black transition-all shadow-lg active:scale-95 shrink-0"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline">Instalar App</span>
+          </button>
+          <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-xs font-black shadow-inner transition-colors duration-500 shrink-0 ${
             activeTab === 'mercadolivre' ? 'bg-yellow-400 border-yellow-600 text-black' : 
             activeTab === 'shopee' ? 'bg-orange-950 border-orange-800 text-orange-400' :
             'bg-yellow-500 border-yellow-600 text-black'
