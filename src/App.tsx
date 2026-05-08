@@ -63,7 +63,15 @@ export default function App() {
 }
 
 function MainApp() {
-  const [activeTab, setActiveTab] = useState<Marketplace>('mercadolivre');
+  const [activeTab, setActiveTab] = useState<Marketplace>(() => {
+    const saved = localStorage.getItem('precificador_active_tab');
+    return (saved as Marketplace) || 'mercadolivre';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('precificador_active_tab', activeTab);
+  }, [activeTab]);
+
   const location = useLocation();
   
   // Normalizing pathname for HashRouter sub-routes if needed
@@ -631,9 +639,12 @@ function MainApp() {
                       <span className="truncate">Lista de SKU {activeTab === 'mercadolivre' ? 'Mercado Livre' : activeTab === 'shopee' ? 'Shopee' : 'Amazon'}</span>
                     </h3>
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                      <div className="flex items-center gap-1.5 bg-green-500/10 px-2 md:px-3 py-1.5 rounded-full border border-green-500/20 shrink-0">
-                        <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-[8px] md:text-[10px] font-black text-green-700 uppercase tracking-widest whitespace-nowrap">Cálculos Auditados 2026</span>
+                      <div className="flex flex-col items-end sm:items-start shrink-0">
+                        <div className="flex items-center gap-1.5 bg-green-500/10 px-2 md:px-3 py-1.5 rounded-full border border-green-500/20">
+                          <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                          <span className="text-[8px] md:text-[10px] font-black text-green-700 uppercase tracking-widest whitespace-nowrap">Dados Salvos Localmente</span>
+                        </div>
+                        <span className="text-[6px] md:text-[7px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5 ml-1">Cálculos Auditados Maio/2026</span>
                       </div>
                       <div className="flex gap-2 flex-1 sm:flex-none">
                         <input 
