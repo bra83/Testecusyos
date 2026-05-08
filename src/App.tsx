@@ -62,7 +62,6 @@ export default function App() {
 }
 
 function MainApp() {
-  console.log('MainApp Rendering');
   const [activeTab, setActiveTab] = useState<Marketplace>('mercadolivre');
   const location = useLocation();
   
@@ -95,6 +94,59 @@ function MainApp() {
     adType: 'classico' as AdType,
     shipping: 0
   });
+
+  const [isBatchEditOpen, setIsBatchEditOpen] = useState(false);
+
+  const handleExportCSV = () => {
+    if (filteredSkus.length === 0) return;
+
+    const headers = ['ID', 'Nome', 'Custo (R$)', 'Marketplace', 'Tipo Anúncio', 'Imposto (%)', 'Ads (%)', 'Margem Alvo (%)', 'Preço de Venda (R$)', 'Lucro Líquido (R$)', 'Margem Real (%)'];
+    
+    const rows = filteredSkus.map(sku => {
+      const category = CATEGORIES.find(c => c.id === sku.categoryId) || CATEGORIES[0];
+      const result = calculatePrice({ ...sku, category, marketplace: sku.marketplace });
+      
+      return [
+        sku.id,
+        sku.name,
+        sku.cost.toFixed(2),
+        sku.marketplace,
+        sku.adType,
+        sku.taxPercent,
+        sku.adsPercent,
+        sku.targetMarginPercent,
+        result.salePrice.toFixed(2),
+        result.netProfit.toFixed(2),
+        result.realMarginPercent.toFixed(1)
+      ];
+    });
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map(row => row.join(';'))
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `precificador_pro_export_${activeTab}_${new Date().toLocaleDateString('pt-BR')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleBatchUpdateMargin = (newMargin: number) => {
+    const updatedSkus = skus.map(s => {
+      if (s.marketplace === activeTab && s.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return { ...s, targetMarginPercent: newMargin };
+      }
+      return s;
+    });
+    setSkus(updatedSkus);
+    setIsBatchEditOpen(false);
+  };
 
   const addSKU = () => {
     const newSku: SKUItem = {
@@ -485,8 +537,18 @@ function MainApp() {
                         <span className="text-[8px] md:text-[10px] font-black text-green-700 uppercase tracking-widest whitespace-nowrap">Cálculos Auditados 2026</span>
                       </div>
                       <div className="flex gap-2 flex-1 sm:flex-none">
-                        <button className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider whitespace-nowrap">Exportar CSV</button>
-                        <button className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap">Editar Lote</button>
+                        <button 
+                          onClick={handleExportCSV}
+                          className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-slate-600 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors uppercase tracking-wider whitespace-nowrap"
+                        >
+                          Exportar CSV
+                        </button>
+                        <button 
+                          onClick={() => setIsBatchEditOpen(true)}
+                          className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-[8px] md:text-[10px] font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap"
+                        >
+                          Editar Lote
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -651,6 +713,14 @@ function MainApp() {
           <ComparisonModal 
             sku={comparingSku} 
             onClose={() => setComparingSku(null)} 
+          />
+        )}
+        {isBatchEditOpen && (
+          <BatchEditModal 
+            onClose={() => setIsBatchEditOpen(false)}
+            onConfirm={handleBatchUpdateMargin}
+            itemCount={filteredSkus.length}
+            marketplace={activeTab}
           />
         )}
       </AnimatePresence>
@@ -1276,5 +1346,83 @@ function DetailRow({ label, value }: { label: string, value: number }) {
       <span className="text-[9px] font-bold text-slate-400 uppercase">{label}</span>
       <span className="text-[10px] font-black text-slate-700">R$ {value.toFixed(2)}</span>
     </div>
+  );
+}
+
+function BatchEditModal({ onClose, onConfirm, itemCount, marketplace }: { onClose: () => void, onConfirm: (margin: number) => void, itemCount: number, marketplace: Marketplace }) {
+  const [newMargin, setNewMargin] = useState(20);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <div>
+            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Edição em Lote</h3>
+            <p className="text-xs text-slate-500 font-bold uppercase">{itemCount} Itens Selecionados no {marketplace}</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex gap-3">
+            <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-700 font-medium">Esta ação atualizará a <strong>Margem Alvo</strong> de todos os produtos atualmente visíveis na lista.</p>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Nova Margem Alvo (%)</label>
+            <div className="flex items-center gap-4">
+              <input 
+                type="range" 
+                min="0" 
+                max="50" 
+                step="1"
+                value={newMargin}
+                onChange={(e) => setNewMargin(Number(e.target.value))}
+                className="flex-1 accent-slate-900"
+              />
+              <span className="w-16 text-center py-2 bg-slate-100 rounded-lg text-lg font-black text-slate-800">{newMargin}%</span>
+            </div>
+            <div className="flex justify-between mt-2 px-1">
+              <span className="text-[9px] font-bold text-slate-400">0%</span>
+              <span className="text-[9px] font-bold text-slate-400">25%</span>
+              <span className="text-[9px] font-bold text-slate-400">50%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+          <button 
+            onClick={onClose}
+            className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button 
+            onClick={() => onConfirm(newMargin)}
+            className="flex-1 px-6 py-3 bg-slate-900 text-white text-[10px] font-black uppercase rounded-lg hover:bg-slate-800 transition-colors shadow-lg shadow-black/10"
+          >
+            Aplicar em {itemCount} SKUs
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
