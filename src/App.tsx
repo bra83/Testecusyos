@@ -180,67 +180,162 @@ function MainApp() {
   };
 
   const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+  try {
     const file = event.target.files?.[0];
+
     if (!file) return;
 
     const reader = new FileReader();
+
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const lines = text.split('\n');
-      if (lines.length < 2) return;
+      try {
+        const text = e.target?.result;
 
-      const headers = lines[0].replace('\uFEFF', '').split(';');
-      const newSkus: SKUItem[] = [...skus];
-
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        
-        const values = line.split(';');
-        if (values.length < 5) continue;
-
-        const getVal = (headerName: string) => {
-          const index = headers.findIndex(h => h.trim() === headerName);
-          return index !== -1 ? values[index]?.trim() : undefined;
-        };
-
-        const parseNum = (val?: string) => {
-          if (!val) return 0;
-          return Number(val.replace(',', '.'));
-        };
-
-        const marketplace = (getVal('Marketplace') || activeTab) as Marketplace;
-        const categoryId = getVal('Categoria ID') || 
-                           (marketplace === 'mercadolivre' ? 'casa_moveis' : (marketplace === 'amazon' ? 'casa' : 'geral'));
-
-        const importedSku: SKUItem = {
-          id: getVal('ID') || Math.random().toString(36).substr(2, 9),
-          name: getVal('Nome') || `Importado ${i}`,
-          cost: parseNum(getVal('Custo (R$)')),
-          marketplace,
-          adType: (getVal('Tipo Anúncio') || 'classico') as AdType,
-          taxPercent: parseNum(getVal('Imposto (%)')),
-          adsPercent: parseNum(getVal('Ads (%)')),
-          targetMarginPercent: parseNum(getVal('Margem Alvo (%)')),
-          categoryId,
-          fulfillment: parseNum(getVal('Fulfillment (R$)')),
-          shipping: parseNum(getVal('Frete (R$)')),
-          amazonTierId: getVal('Amazon Tier ID') || undefined
-        };
-
-        const existingIndex = newSkus.findIndex(s => s.id === importedSku.id);
-        if (existingIndex !== -1) {
-          newSkus[existingIndex] = importedSku;
-        } else {
-          newSkus.push(importedSku);
+        if (typeof text !== 'string') {
+          console.error('CSV inválido');
+          return;
         }
-      }
 
-      setSkus(newSkus);
-      event.target.value = '';
+        const lines = text
+          .replace(/\r/g, '')
+          .split('\n')
+          .filter(line => line.trim() !== '');
+
+        if (lines.length < 2) {
+          console.error('CSV vazio');
+          return;
+        }
+
+        const headers = lines[0]
+          .replace('\uFEFF', '')
+          .split(';')
+          .map(h => h.trim());
+
+        const newSkus: SKUItem[] = [...skus];
+
+        for (let i = 1; i < lines.length; i++) {
+          try {
+            const line = lines[i];
+
+            if (!line || !line.trim()) continue;
+
+            const values = line.split(';');
+
+            const getVal = (headerName: string): string => {
+              const index = headers.findIndex(
+                h => h.trim() === headerName
+              );
+
+              if (index === -1) return '';
+
+              return values[index]?.trim() || '';
+            };
+
+            const parseNum = (val?: string) => {
+              if (!val) return 0;
+
+              const parsed = Number(
+                val
+                  .replace(/\./g, '')
+                  .replace(',', '.')
+              );
+
+              return isNaN(parsed) ? 0 : parsed;
+            };
+
+            const marketplace = (
+              getVal('Marketplace') || activeTab
+            ) as Marketplace;
+
+            const categoryId =
+              getVal('Categoria ID') ||
+              (
+                marketplace === 'mercadolivre'
+                  ? 'casa_moveis'
+                  : marketplace === 'amazon'
+                  ? 'casa'
+                  : 'geral'
+              );
+
+            const importedSku: SKUItem = {
+              id:
+                getVal('ID') ||
+                Math.random().toString(36).substr(2, 9),
+
+              name:
+                getVal('Nome') || `Importado ${i}`,
+
+              cost: parseNum(getVal('Custo (R$)')),
+
+              marketplace,
+
+              adType: (
+                getVal('Tipo Anúncio') || 'classico'
+              ) as AdType,
+
+              taxPercent: parseNum(
+                getVal('Imposto (%)')
+              ),
+
+              adsPercent: parseNum(
+                getVal('Ads (%)')
+              ),
+
+              targetMarginPercent: parseNum(
+                getVal('Margem Alvo (%)')
+              ),
+
+              categoryId,
+
+              fulfillment: parseNum(
+                getVal('Fulfillment (R$)')
+              ),
+
+              shipping: parseNum(
+                getVal('Frete (R$)')
+              ),
+
+              amazonTierId:
+                getVal('Amazon Tier ID') || undefined
+            };
+
+            const existingIndex = newSkus.findIndex(
+              s => s.id === importedSku.id
+            );
+
+            if (existingIndex !== -1) {
+              newSkus[existingIndex] = importedSku;
+            } else {
+              newSkus.push(importedSku);
+            }
+          } catch (lineError) {
+            console.error(
+              `Erro ao processar linha ${i + 1}`,
+              lineError
+            );
+          }
+        }
+
+        setSkus(newSkus);
+
+        if (event.target) {
+          event.target.value = '';
+        }
+      } catch (error) {
+        console.error('Erro ao processar CSV:', error);
+      }
     };
-    reader.readAsText(file);
-  };
+
+    reader.onerror = () => {
+      console.error('Erro ao ler arquivo CSV');
+    };
+
+    reader.readAsText(file, 'UTF-8');
+  } catch (error) {
+    console.error('Erro geral CSV:', error);
+  }
+};
 
   const handleBatchUpdateMargin = (newMargin: number) => {
     const updatedSkus = skus.map(s => {
