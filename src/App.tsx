@@ -180,7 +180,6 @@ function MainApp() {
   };
 
   const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
   try {
     const file = event.target.files?.[0];
 
